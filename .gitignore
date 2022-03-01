@@ -1,0 +1,6 @@
+/node_modules/
+/public/build
+/public/static/csv/*.csv
+.DS_Store
+package-lock.json
+.vercel
