@@ -1,13 +1,16 @@
 <script>
 	import { onMount } from "svelte";
-	import { scaleLinear } from "d3-scale";
+	import * as d3 from 'd3'
 
-	let instances = new Array();
+	let artists = new Array();
+	let tracks = new Array();
 
 	onMount(async () => {
-		const fetched = await fetch("./static/prediction_results.json");
-		instances = (await fetched.json()).test_instances;
-		console.log(instances);
+		// Load artists csv
+		artists = await d3.csv('static/csv/artists.csv');
+		tracks = await d3.csv('static/csv/tracks.csv')
+		console.log(artists);
+		console.log(tracks);
 	});
 </script>
 

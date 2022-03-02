@@ -2,6 +2,13 @@
 
 Visual Analytics Winter 2022 Group Project
 
+# Setting up the web server
+```sh
+npm install
+npm run build
+npm run dev
+```
+
 ## Data
 
 It's bad practice to store large file on GitHub. Due to this, the data must first be downloaded from Google Drive and placed in the appropriate place in the repository. This can be done in one of two ways:
