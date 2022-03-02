@@ -1,6 +1,7 @@
 <script>
 	import { onMount } from "svelte";
-	import * as d3 from 'd3'
+	import * as d3 from 'd3';
+	import { spotifyApi } from './api.js';
 
 	let artists = new Array();
 	let tracks = new Array();
