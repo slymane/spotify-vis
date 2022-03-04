@@ -8,6 +8,6 @@
 
 <style>
 #SongSearchListBar{
-    height: 300px;
+    height: 100%;
 }
 </style>

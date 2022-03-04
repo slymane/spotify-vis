@@ -8,6 +8,6 @@
 
 <style>
 #CircleOfFifth{
-    height: 200px;
+    height: 100%;
 }
 </style>

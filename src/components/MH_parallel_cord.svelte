@@ -8,6 +8,6 @@
 
 <style>
 #parallelCoordinates{
-    height: 300px;
+    height: 100%;
 }
 </style>

@@ -7,8 +7,8 @@
 </div>
 
 <style>
+
 #timeline{
-    height: 150px;
-    width: 480px;
+    height: 100%;
 }
 </style>
