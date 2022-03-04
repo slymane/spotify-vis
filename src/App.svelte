@@ -1,96 +1,136 @@
 <script>
-	import { onMount } from "svelte";
-	import * as d3 from 'd3';
-	import SongSearchListBar from './components/HM_song_search_list_bar.svelte';
-	import BarCharts from './components/HM_bar_charts.svelte';
-	import CircleOfFifth from './components/MM_circle_of_fifth.svelte';
-	import Timeline from './components/MM_timeline.svelte';
-	import ParallelCoordinates from './components/MH_parallel_cord.svelte';
-	import Recommend from  './components/ES_recomended_filters_Search.svelte';
+  import { onMount } from "svelte";
+  import * as d3 from "d3";
+  import SongSearchListBar from "./components/HM_song_search_list_bar.svelte";
+  import BarCharts from "./components/HM_bar_charts.svelte";
+  import CircleOfFifth from "./components/MM_circle_of_fifth.svelte";
+  import Timeline from "./components/MM_timeline.svelte";
+  import ParallelCoordinates from "./components/MH_parallel_cord.svelte";
+  import Recommend from "./components/ES_recomended_filters_Search.svelte";
 
-	let artists = new Array();
-	let tracks = new Array();
+  // Head for history tree
+  // History is structured as a tree to allow for multiple "timelines"
+  let historyRoot = null;
 
-	onMount(async () => {
-		// Load artists csv
-		artists = await d3.csv('static/csv/artists.csv');
-		tracks = await d3.csv('static/csv/tracks.csv')
-		console.log(artists);
-		console.log(tracks);
-	});
+  // History node the current visualization state
+  let curHistoryNode;
+
+  class HistoryNode {
+    constructor(artists, id /* Other vis info */) {
+      this.id = id;
+      this.artists = artists;
+      this.children = [];
+    }
+
+    // Add a child to this node
+    addChild(child) {
+      this.children.push(child);
+    }
+
+    // Get the child at the given index
+    getChild(index) {
+      return this.children[index];
+    }
+
+    // Get the number of children
+    getNumChildren() {
+      return this.children.length;
+    }
+
+    // Get the index of the given child
+    getChildIndex(child) {
+      return this.children.indexOf(child);
+    }
+
+    // Remove the given child
+    // Does nothing if child is not a child of this node
+    removeChild(child) {
+      let index = this.getChildIndex(child);
+      if (index != -1) {
+        this.children.splice(index, 1);
+      }
+    }
+  }
+
+  let artists = new Array();
+  let tracks = new Array();
+
+  onMount(async () => {
+    // Load artists csv
+    artists = await d3.csv("static/csv/artists.csv");
+    tracks = await d3.csv("static/csv/tracks.csv");
+    console.log(artists);
+    console.log(tracks);
+  });
 </script>
 
 <main>
-    <div id="main">
-		<div id="search_and_charts">
+  <div id="main">
+    <div id="search_and_charts">
+      <div id="searchList_and_circle">
+        <div style="height: 66%;" class="view-panel">
+          <SongSearchListBar />
+        </div>
+        <div style="height: 33%;" class="view-panel">
+          <CircleOfFifth />
+        </div>
+      </div>
 
-			<div id="searchList_and_circle">
-				<div style="height: 66%;" class="view-panel">
-					<SongSearchListBar/>
-				</div>
-				<div style="height: 33%;" class="view-panel">
-					<CircleOfFifth/>
-				</div>
-			</div>
+      <div id="barChart_and_parCord">
+        <div style="height: 33%;" class="view-panel">
+          <BarCharts />
+        </div>
+        <div style="height: 66%;" class="view-panel">
+          <ParallelCoordinates />
+        </div>
+      </div>
+    </div>
 
-			<div id="barChart_and_parCord">
-				<div style="height: 33%;" class="view-panel">
-					<BarCharts/>
-				</div>
-				<div style="height: 66%;" class="view-panel">
-					<ParallelCoordinates/>	
-				</div>
-			</div>
-		</div>
-
-		<div id="timeline_and_recommend">
-			<div style="width: 25%;" class="view-panel">
-				<Timeline/>
-			</div>
-			<div style="width: 75%;"class="view-panel">
-				<Recommend/>
-			</div>
-		</div>
-		
-
-	</div>
-
+    <div id="timeline_and_recommend">
+      <div style="width: 25%;" class="view-panel">
+        <Timeline />
+      </div>
+      <div style="width: 75%;" class="view-panel">
+        <Recommend />
+      </div>
+    </div>
+  </div>
 </main>
 
 <style>
-	#main{
-		display: flex;
-		flex-direction: column;
-		width: 100%;
-	}
-	#search_and_charts{
-		display: flex;
-		flex-direction: row;
-		width: 100%;
-		height: 800px;
-	}
-	#searchList_and_circle{
-		display: flex;
-		flex-direction: column;
-		width: 25%;
-		height: 100%;
-	}
-	#barChart_and_parCord{
-		display: flex;
-		flex-direction: column;
-		width: 75%;
-		height: 100%;
-	}
-	#timeline_and_recommend{
-		display: flex;
-		flex-direction: row;
-		width: 100%;
-		height: 400px;
-	}
+  #main {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+  }
+  #search_and_charts {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    height: 800px;
+  }
+  #searchList_and_circle {
+    display: flex;
+    flex-direction: column;
+    width: 25%;
+    height: 100%;
+  }
+  #barChart_and_parCord {
+    display: flex;
+    flex-direction: column;
+    width: 75%;
+    height: 100%;
+  }
+  #timeline_and_recommend {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    height: 400px;
+  }
 
-	.view-panel {
-		border: 2px solid #eee;
-		margin-bottom: 5px;
-		margin-right: 5px;
-	}
+  .view-panel {
+    border: 2px solid #eee;
+    margin-bottom: 5px;
+    margin-right: 5px;
+  }
 </style>
