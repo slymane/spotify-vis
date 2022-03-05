@@ -1,67 +1,73 @@
 <script>
-  import { onMount } from "svelte";
-  import * as d3 from "d3";
-  import SongSearchListBar from "./components/HM_song_search_list_bar.svelte";
-  import BarCharts from "./components/HM_bar_charts.svelte";
-  import CircleOfFifth from "./components/MM_circle_of_fifth.svelte";
-  import Timeline from "./components/MM_timeline.svelte";
-  import ParallelCoordinates from "./components/MH_parallel_cord.svelte";
-  import Recommend from "./components/ES_recomended_filters_Search.svelte";
+	import { onMount } from "svelte";
+	import * as d3 from 'd3';
+	import SongSearchListBar from './components/HM_song_search_list_bar.svelte';
+	import BarCharts from './components/HM_bar_charts.svelte';
+	import CircleOfFifth from './components/MM_circle_of_fifth.svelte';
+	import Timeline from './components/MM_timeline.svelte';
+	import ParallelCoordinates from './components/MH_parallel_cord.svelte';
+	import Recommend from  './components/ES_recomended_filters_Search.svelte';
+	import {recommendedTracks} from './stores.js';
 
-  // Head for history tree
-  // History is structured as a tree to allow for multiple "timelines"
-  let historyRoot = null;
+	// Head for history tree
+	// History is structured as a tree to allow for multiple "timelines"
+	let historyRoot = null;
 
-  // History node the current visualization state
-  let curHistoryNode;
+	// History node the current visualization state
+	let curHistoryNode;
 
-  class HistoryNode {
-    constructor(artists, id /* Other vis info */) {
-      this.id = id;
-      this.artists = artists;
-      this.children = [];
-    }
+	let recTracks;
+	recommendedTracks.subscribe(v => {
+		recTracks = v;
+	})
 
-    // Add a child to this node
-    addChild(child) {
-      this.children.push(child);
-    }
+	let artists;
+	let tracks;
 
-    // Get the child at the given index
-    getChild(index) {
-      return this.children[index];
-    }
+	onMount(async () => {
+		// Load artists csv
+		artists = await d3.csv('static/csv/artists.csv');
+		tracks = await d3.csv('static/csv/tracks.csv')
+		console.log(artists);
+		console.log(tracks);
 
-    // Get the number of children
-    getNumChildren() {
-      return this.children.length;
-    }
+		class HistoryNode {
+			constructor(artists, id /* Other vis info */) {
+				this.id = id;
+				this.artists = artists;
+				this.children = [];
+			}
 
-    // Get the index of the given child
-    getChildIndex(child) {
-      return this.children.indexOf(child);
-    }
+			// Add a child to this node
+			addChild(child) {
+				this.children.push(child);
+			}
 
-    // Remove the given child
-    // Does nothing if child is not a child of this node
-    removeChild(child) {
-      let index = this.getChildIndex(child);
-      if (index != -1) {
-        this.children.splice(index, 1);
-      }
-    }
-  }
+			// Get the child at the given index
+			getChild(index) {
+				return this.children[index];
+			}
 
-  let artists = new Array();
-  let tracks = new Array();
+			// Get the number of children
+			getNumChildren() {
+				return this.children.length;
+			}
 
-  onMount(async () => {
-    // Load artists csv
-    artists = await d3.csv("static/csv/artists.csv");
-    tracks = await d3.csv("static/csv/tracks.csv");
-    console.log(artists);
-    console.log(tracks);
-  });
+			// Get the index of the given child
+			getChildIndex(child) {
+				return this.children.indexOf(child);
+			}
+
+			// Remove the given child
+			// Does nothing if child is not a child of this node
+			removeChild(child) {
+			let index = this.getChildIndex(child);
+				if (index != -1) {
+					this.children.splice(index, 1);
+				}
+			}
+  		}
+	});
 </script>
 
 <main>
@@ -98,35 +104,36 @@
 </main>
 
 <style>
-  #main {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-  }
-  #search_and_charts {
-    display: flex;
-    flex-direction: row;
-    width: 100%;
-    height: 800px;
-  }
-  #searchList_and_circle {
-    display: flex;
-    flex-direction: column;
-    width: 25%;
-    height: 100%;
-  }
-  #barChart_and_parCord {
-    display: flex;
-    flex-direction: column;
-    width: 75%;
-    height: 100%;
-  }
-  #timeline_and_recommend {
-    display: flex;
-    flex-direction: row;
-    width: 100%;
-    height: 400px;
-  }
+	#main{
+		display: flex;
+		flex-direction: column;
+		width: 100%;
+		height: 1200px;
+	}
+	#search_and_charts{
+		display: flex;
+		flex-direction: row;
+		width: 100%;
+		height: 66%;
+	}
+	#searchList_and_circle{
+		display: flex;
+		flex-direction: column;
+		width: 25%;
+		height: 100%;
+	}
+	#barChart_and_parCord{
+		display: flex;
+		flex-direction: column;
+		width: 75%;
+		height: 100%;
+	}
+	#timeline_and_recommend{
+		display: flex;
+		flex-direction: row;
+		width: 100%;
+		height: 33%;
+	}
 
   .view-panel {
     border: 2px solid #eee;
