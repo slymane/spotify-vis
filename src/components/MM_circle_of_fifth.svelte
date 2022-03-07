@@ -89,7 +89,7 @@
     height="100%"
     width="auto"
     viewBox="0 0 100 100"
-    preserveAspectRatio="none"
+    preserveAspectRatio="xMinYMin meet"
   >
     <!-- Outer circle - Major -->
     <g id="cof-sections">
@@ -144,17 +144,6 @@
         {/if}
       {/each}
     </g>
-    <!-- Key Heatmap -->
-    <!-- {#each keyEntries as entry, i}
-      {#if entry[1] > 0}
-        <polygon
-          points="50% ,50% 50%,50% 50%, 50%"
-          fill={heatmapColorScale(entry[1])}
-          stroke="black"
-          stroke-width="2"
-        />
-      {/if}
-    {/each} -->
   </svg>
 </div>
 
