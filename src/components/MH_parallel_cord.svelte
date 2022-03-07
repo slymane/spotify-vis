@@ -2,14 +2,14 @@
     import { scaleLinear, scaleOrdinal } from "d3-scale";
 	import { schemeCategory10 } from "d3-scale-chromatic";
     let feature_name_list =[
-            {name:"acousticness",feature_checkbox:false},
+            {name:"acousticness",feature_checkbox:true},
             {name:"danceability",feature_checkbox:true},
             {name:"energy",feature_checkbox:true},
             {name:"instrumentalness",feature_checkbox:true},
-            {name:"liveness",feature_checkbox:false},
-            {name:"loudness",feature_checkbox:false},
+            {name:"liveness",feature_checkbox:true},
+            {name:"loudness",feature_checkbox:true},
             {name:"popularity",feature_checkbox:true},
-            {name:"speechiness",feature_checkbox:false},
+            {name:"speechiness",feature_checkbox:true},
             {name:"valence",feature_checkbox:true},
         ];
     $: checkedFeatures = feature_name_list.map(function(item){
@@ -28,7 +28,7 @@
     // 0 to 1050 whole width
     let xLeft=70;
     let xRight=980;
-    let bar_base=370;
+    let bar_base=470;
     let bar_top=70;
     let totalWidth=xRight-xLeft;
     let eachWidth=totalWidth/9;
@@ -45,6 +45,8 @@
     let lastPos;
     let nextFeature;
     let colorScale;
+    let lineSelect=false;
+    let selectedSong=null;
     
     const attrsShort = [
         'acoustic', 'dance.', 'energy', 'instru.', 'liveness', 
@@ -171,15 +173,20 @@
 </script>
 
 <div id="parallelCoordinates">
-    <div id="chart">
-        <svg id="svgCharts">
+    <div class="chart">
+        <svg id="svgCharts"
+            viewBox="-20 0 1000 600"
+            preserveAspectRatio="xMinYMid meet"
+        >
             <g id="chartView">
                 <!-- baseline -->
                 <line class="axis" x1={xLeft} y1={bar_base} x2={xRight} y2={bar_base}/>
                 <!-- drawing each vertical line -->
                 {#each checkedFeatures as feature,i}
                     {#if feature!=null}
-                        <line class="axis" x1={xLeft+positionCalculation(checkedFeatures,feature)} y1={bar_base} x2={xLeft+positionCalculation(checkedFeatures,feature)} y2={bar_top}/>
+                        <line class="axis" x1={xLeft+positionCalculation(checkedFeatures,feature)} 
+                        y1={bar_base} x2={xLeft+positionCalculation(checkedFeatures,feature)} y2={bar_top}
+                        />
                         <text class="x_labels" x={xLeft+positionCalculation(checkedFeatures,feature)-20} y={bar_base+20}>{attrsShort[checkedFeatures.indexOf(feature)]}</text>
                         <text class="y_labels" x={xLeft+positionCalculation(checkedFeatures,feature)-25} y={bar_base-2}>0.0</text>
                         <text class="y_labels" x={xLeft+positionCalculation(checkedFeatures,feature)-25} y={bar_top+2}>1.0</text>
@@ -197,12 +204,19 @@
                     {#each checkedFeatures as feature,j}
                         {#if feature!=null}
                             {#if feature!=lastPosition(checkedFeatures, feature)}
-                                <line class="axis" 
+                                <line class="value_lines {lineSelect!=false ? selectedSong==songs[i]["id"] ? "this-one-selected":"this-one-not-selected":"pre-selected"}" 
                                 x1={xLeft+positionCalculation(checkedFeatures,feature)}  
                                 y1={bar_base+((songs[i][feature])*barHeight)} 
                                 x2={xLeft+positionCalculation(checkedFeatures,feature)+eachWidth}  
                                 y2={bar_base+((songs[i][nextFeatureFind(checkedFeatures,feature)])*barHeight)} 
                                 style="stroke: {colorScale(songs[i]["id"])};"
+                                on:mouseenter={()=>{
+                                    selectedSong=songs[i]["id"];
+                                    lineSelect=true;
+                                }}
+                                on:mouseleave={()=>{
+                                   lineSelect=false;
+                                }}
                                 />
                             {:else if singleLengthFind(checkedFeatures)==1}
                                 <circle class="circleValue" cx={xLeft+positionCalculation(checkedFeatures,feature)}
@@ -216,7 +230,6 @@
             </g>
         </svg>
     </div>
-    <!-- on:click={() => console.log(checkedFeatures)} -->
     <div id="feature">
         {#each feature_name_list as {name, feature_checkbox}}
             <div id="eachFeature">
@@ -226,30 +239,39 @@
             </div>
         {/each}
     </div>
+    <!-- on:click={() => console.log(checkedFeatures)} -->
 </div>
 
 <style>
 #parallelCoordinates{
     display: flex;
     height: 100%;
+    width: 100%;
     flex-direction: row;
 }
-#chart{
+.chart{
+    /* display: flex;
+    width:75%;
+    height: 100%;
+    justify-content: center; */
     display: flex;
-    width: 75%;
+	/* position: relative; */
+	width: 75%;
+    height: 100%;
+	/* padding-bottom: 10%;  */
+	/* vertical-align: middle;  */
+	overflow: hidden;
+    
 }
-#svgCharts{
-    width: 100%;
-}
-/* #chartView{
-    width: 100%;
-    height: 50%;
+/* #svgCharts{
+    display: block;
 } */
-
 #feature{
     display: flex;
     width: 25%;
+    height: 100%;
     flex-direction: column;
+    overflow: hidden;
 }
 #eachFeature{
     display: flex;
@@ -268,7 +290,7 @@
     font-size: large;
 }
 .y_labels{
-    font-size: smaller;
+    font-size:medium;
 }
 .axis{
 		stroke: black;
@@ -278,6 +300,24 @@
 		stroke: black;
 		stroke-width: 1;
 	}
+line.value_lines{
+    stroke-width: 3; 
+    stroke-opacity: 0.75;  
+}
+line.pre-selected{
+    stroke-width: 2; 
+    stroke-opacity: 0.75;  
+}
+line.this-one-selected{
+    stroke-width: 3; 
+    stroke-opacity: 1;
+}
+line.this-one-not-selected{
+    stroke-width: 1; 
+    stroke-opacity: 0.2;
+}
+
+
 #feature_checkbox{
     cursor: pointer;
 }
