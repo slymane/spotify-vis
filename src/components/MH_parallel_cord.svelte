@@ -50,11 +50,6 @@
         'acoustic', 'dance.', 'energy', 'instru.', 'liveness', 
         'loud.', 'pop.', 'speech.', 'valence'
     ];
-    // colorScale = scaleOrdinal(schemeCategory10)
-	// 		.domain(0,10);
-
-   
-
     let songs=[
         {
             id:1,
@@ -96,7 +91,7 @@
             id:4,
             acousticness:0.7,
             danceability:0.6,
-            energy:0.5,
+            energy:0.8,
             instrumentalness:0.4,
             liveness:0.2,
             loudness:0.6,
@@ -108,7 +103,6 @@
     yScaleNew=scaleLinear()
 			.domain([0,1]);
     yScaleTicks=yScaleNew.ticks(20);
-    console.log(yScaleTicks)
     colorScale = scaleOrdinal(schemeCategory10)
 			.domain(songs.map(song => song["id"]));
 
@@ -146,8 +140,6 @@
             }
         });
         index=featureArray.indexOf(feature);
-        // console.log(index);
-
         if (index==(featureArray.length-1)) {
             return feature;
         }
@@ -165,6 +157,15 @@
         index=featureArray.indexOf(feature);
         nextFeature=featureArray[index+1];
         return nextFeature;
+    }
+    function singleLengthFind(checkedFeatures){
+        featureArray=[];
+        checkedFeatures.forEach(element => {
+            if (element!=null){
+                featureArray.push(element);
+            }
+        });
+        return featureArray.length;
     }
     
 </script>
@@ -187,7 +188,6 @@
                         {#each yScaleTicks as tick}
                             <line class="yaxis" x1={xLeft+positionCalculation(checkedFeatures,feature)-5} y1={bar_base+(tick*barHeight)} x2={xLeft+positionCalculation(checkedFeatures,feature)+5} y2={bar_base+(tick*barHeight)}/>
                             <!-- <text class="y_labels" x={xLeft+positionCalculation(checkedFeatures,feature)-30} y={bar_base+(tick*barHeight)}> {tick} </text>> -->
-                        
                         {/each}
                     {/if}    
                 {/each}
@@ -196,20 +196,6 @@
                 {#each songs as song,i}
                     {#each checkedFeatures as feature,j}
                         {#if feature!=null}
-                            <!-- {lastPos=lastPosition(checkedFeatures, feature)} -->
-                            <!-- {#if lastPos==false}
-                                {console.log(lastPos)}
-                            {/if} -->
-                            <!-- {#if feature!=lastPosition(checkedFeatures, feature)}
-                                <line class="axis" 
-                                x1={xLeft+positionCalculation(checkedFeatures,feature)}  
-                                y1={bar_base+((Math.floor(Math.random() * 10) + 1)/20)*barHeight} 
-                                x2={xLeft+positionCalculation(checkedFeatures,feature)+eachWidth}  
-                                y2={bar_base+((Math.floor(Math.random() * 10) + 1)/20)*barHeight} 
-                                />
-                            {/if} -->
-                        
-                            
                             {#if feature!=lastPosition(checkedFeatures, feature)}
                                 <line class="axis" 
                                 x1={xLeft+positionCalculation(checkedFeatures,feature)}  
@@ -217,6 +203,10 @@
                                 x2={xLeft+positionCalculation(checkedFeatures,feature)+eachWidth}  
                                 y2={bar_base+((songs[i][nextFeatureFind(checkedFeatures,feature)])*barHeight)} 
                                 style="stroke: {colorScale(songs[i]["id"])};"
+                                />
+                            {:else if singleLengthFind(checkedFeatures)==1}
+                                <circle class="circleValue" cx={xLeft+positionCalculation(checkedFeatures,feature)}
+                                cy={bar_base+((songs[i][feature])*barHeight)} r="6" style="fill: {colorScale(songs[i]["id"])};"
                                 />
                             {/if}
                         {/if}
@@ -290,5 +280,9 @@
 	}
 #feature_checkbox{
     cursor: pointer;
+}
+.circleValue{
+    stroke-width: 1;
+    fill-opacity: 1;
 }
 </style>
