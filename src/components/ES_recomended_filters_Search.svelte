@@ -52,11 +52,12 @@
             <span class='slider' style='width: {100 / attrs.length}%'>
                 <span class='range'>
                     <RangeSlider id='rs-{attr}' bind:values={values[attr]} min={0} max={1} step={0.01} pipstep={5}
-                        formatter={(v,i,p) => v.toFixed(2)} pips vertical float range/>   
+                        formatter={(v,i,p) => v.toFixed(2)}  pips vertical float range
+                        disabled={!isEnabled[attr]} hoverable={isEnabled[attr]}/>   
                 </span>
                 <label>
                     <input type=checkbox bind:checked={isEnabled[attr]}>
-                    {attrsShort[i]}
+                    <span class:disabled={!isEnabled[attr]}>{attrsShort[i]}</span>
                 </label>
             </span>
         {/each}
@@ -119,6 +120,10 @@
     #rec-button:hover{
         color: white;
         background-color:gray;
+    }
+
+    .disabled {
+        color: gray;
     }
 
     .slider {
