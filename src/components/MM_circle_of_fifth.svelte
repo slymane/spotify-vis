@@ -86,7 +86,7 @@
 <div id="CircleOfFifth">
   <!-- <p>HeatMap</p> -->
   <svg
-    id="CircleOfFifthSVG"
+    id="CircleOfFifth-SVG"
     height="100%"
     width="auto"
     viewBox="0 0 150 100"
