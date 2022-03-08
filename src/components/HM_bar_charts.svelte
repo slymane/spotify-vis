@@ -34,11 +34,15 @@
     }
 
 	const xTicks = [1990, 1995, 2000, 2005, 2010, 2015];
-	const yTicks = [0, 0.05, .10, .15, .20];
+	const yTicks = [0, 5, 10, 15, 20];
 	const padding = { top: 20, right: 15, bottom: 20, left: 25 };
 
 	let width = 500;
 	let height = 200;
+
+	function formatMobile(tick) {
+		return "'" + tick.toString().slice(-2);
+	}
 
 	$: xScale = scaleLinear()
 		.domain([0, xTicks.length])
@@ -52,40 +56,38 @@
 	$: barWidth = innerWidth / xTicks.length;
 </script>
 
-<div class="container">
-    <div class="chart" bind:clientWidth={width} bind:clientHeight={height}>
-        <svg>
-            <!-- y axis -->
-            <g class="axis y-axis">
-                {#each yTicks as tick}
-                    <g class="tick tick-{tick}" transform="translate(0, {yScale(tick)})">
-                        <line x2="100%"></line>
-                        <text y="-4">{tick} {tick === 20 ? ' per 1,000 population' : ''}</text>
-                    </g>
-                {/each}
-            </g>
+<div class="chart" bind:clientWidth={width} bind:clientHeight={height}>
+	<svg>
+		<!-- y axis -->
+		<g class="axis y-axis">
+			{#each yTicks as tick}
+				<g class="tick tick-{tick}" transform="translate(0, {yScale(tick)})">
+					<line x2="100%"></line>
+					<text y="-4">{tick} {tick === 20 ? ' Occurances' : ''}</text>
+				</g>
+			{/each}
+		</g>
 
-            <!-- x axis -->
-            <g class="axis x-axis">
-                {#each graphedTracksArtists as point, i}
-                    <g class="tick" transform="translate({xScale(i)},{height})">
-                        <text x="{barWidth/2}" y="-4">{width > 380 ? point.artist : formatMobile(point.artist)}</text>
-                    </g>
-                {/each}
-            </g>
+		<!-- x axis -->
+		<g class="axis x-axis">
+			{#each graphedTracksArtists as point, i}
+				<g class="tick" transform="translate({xScale(i)},{height})">
+					<text x="{barWidth/2}" y="-4">{width > 380 ? point.artist : formatMobile(point.artist)}</text>
+				</g>
+			{/each}
+		</g>
 
-            <g class='bars'>
-                {#each graphedTracksArtists as point, i}
-                    <rect
-                        x="{xScale(i) + 2}"
-                        y="{yScale(point.occurance)}"
-                        width="{barWidth - 4}"
-                        height="{yScale(point.occurance)}"
-                    ></rect>
-                {/each}
-            </g>
-        </svg>
-    </div>
+		<g class='bars'>
+			{#each graphedTracksArtists as point, i}
+				<rect
+					x="{xScale(i) + 2}"
+					y="{yScale(point.occurrence)}"
+					width="{barWidth - 4}"
+					height="{yScale(0) - yScale(point.occurrence)}"
+				></rect>
+			{/each}
+		</g>
+	</svg>
 </div>
 
 
