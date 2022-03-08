@@ -1,6 +1,14 @@
 <script>
     import { scaleLinear, scaleOrdinal } from "d3-scale";
 	import { schemeCategory10 } from "d3-scale-chromatic";
+    import { addedTracks, recommendedTracks } from '../stores.js';
+
+    let songs;
+    addedTracks.subscribe(v => {songs = v});
+    console.log(songs);
+    let recTracks;
+    recommendedTracks.subscribe(v => {recTracks = v});
+
     let feature_name_list =[
             {name:"acousticness",feature_checkbox:true},
             {name:"danceability",feature_checkbox:true},
@@ -47,61 +55,65 @@
     let colorScale;
     let lineSelect=false;
     let selectedSong=null;
+    let min_value=0;
+    let max_value=1;
+    let norm_value=0;
+    let next_F;
     
     const attrsShort = [
         'acoustic', 'dance.', 'energy', 'instru.', 'liveness', 
         'loud.', 'pop.', 'speech.', 'valence'
     ];
-    let songs=[
-        {
-            id:1,
-            acousticness:0.0,
-            danceability:0.2,
-            energy:0.5,
-            instrumentalness:0.4,
-            liveness:0.2,
-            loudness:0.3,
-            popularity:0.1,
-            speechiness:0.4,
-            valence:0.7,
-        },
-        {
-            id:2,
-            acousticness:0.3,
-            danceability:0.4,
-            energy:0.3,
-            instrumentalness:0.6,
-            liveness:0.5,
-            loudness:0.1,
-            popularity:0.1,
-            speechiness:0.4,
-            valence:0.8
-        },
-        {
-            id:3,
-            acousticness:0.5,
-            danceability:0.6,
-            energy:0.4,
-            instrumentalness:0.4,
-            liveness:0.2,
-            loudness:0.5,
-            popularity:0.2,
-            speechiness:0.4,
-            valence:0.7
-        },
-        {
-            id:4,
-            acousticness:0.7,
-            danceability:0.6,
-            energy:0.8,
-            instrumentalness:0.4,
-            liveness:0.2,
-            loudness:0.6,
-            popularity:0.3,
-            speechiness:0.4,
-            valence:0.8
-        },
-    ]
+    // let songs=[
+    //     {
+    //         id:1,
+    //         acousticness:0.0,
+    //         danceability:0.2,
+    //         energy:0.5,
+    //         instrumentalness:0.4,
+    //         liveness:0.2,
+    //         loudness:0.3,
+    //         popularity:0.1,
+    //         speechiness:0.4,
+    //         valence:0.7,
+    //     },
+    //     {
+    //         id:2,
+    //         acousticness:0.3,
+    //         danceability:0.4,
+    //         energy:0.3,
+    //         instrumentalness:0.6,
+    //         liveness:0.5,
+    //         loudness:0.1,
+    //         popularity:0.1,
+    //         speechiness:0.4,
+    //         valence:0.8
+    //     },
+    //     {
+    //         id:3,
+    //         acousticness:0.5,
+    //         danceability:0.6,
+    //         energy:0.4,
+    //         instrumentalness:0.4,
+    //         liveness:0.2,
+    //         loudness:0.5,
+    //         popularity:0.2,
+    //         speechiness:0.4,
+    //         valence:0.7
+    //     },
+    //     {
+    //         id:4,
+    //         acousticness:0.7,
+    //         danceability:0.6,
+    //         energy:0.8,
+    //         instrumentalness:0.4,
+    //         liveness:0.2,
+    //         loudness:0.6,
+    //         popularity:0.3,
+    //         speechiness:0.4,
+    //         valence:0.8
+    //     },
+    // ]
     yScaleNew=scaleLinear()
 			.domain([0,1]);
     yScaleTicks=yScaleNew.ticks(20);
@@ -169,7 +181,25 @@
         });
         return featureArray.length;
     }
-    
+    function normalizedValue(feature, value){
+        if(feature == "loudness"){
+            min_value=0;
+            max_value=60;
+            norm_value=(Math.abs(value)-min_value)/(max_value-min_value);
+        }
+        else if (feature == "popularity"){
+            min_value=0;
+            max_value=100;
+            norm_value=(Math.abs(value)-min_value)/(max_value-min_value);
+        }
+        else{
+            min_value=0;
+            max_value=1;
+            norm_value=(Math.abs(value)-min_value)/(max_value-min_value);
+        }
+        return norm_value;
+    }   
+
 </script>
 
 <div id="parallelCoordinates">
@@ -200,15 +230,20 @@
                 {/each}
 
                 <!-- drawing value lines -->
+                <!-- y1={bar_base+((songs[i][feature])*barHeight)} -->
+                <!-- y2={bar_base+((songs[i][nextFeatureFind(checkedFeatures,feature)])*barHeight)}  -->
+                <!-- y2={bar_base+(normalizedValue(nextFeatureFind(checkedFeatures,feature),songs[i][nextFeatureFind(checkedFeatures,feature)])*barHeight)}  -->
+                <!-- y1={bar_base+(normalizedValue(feature,songs[i][feature])*barHeight)}  -->
+                <!-- {next_F=nextFeatureFind(checkedFeatures,feature)} -->
                 {#each songs as song,i}
                     {#each checkedFeatures as feature,j}
                         {#if feature!=null}
                             {#if feature!=lastPosition(checkedFeatures, feature)}
                                 <line class="value_lines {lineSelect!=false ? selectedSong==songs[i]["id"] ? "this-one-selected":"this-one-not-selected":"pre-selected"}" 
                                 x1={xLeft+positionCalculation(checkedFeatures,feature)}  
-                                y1={bar_base+((songs[i][feature])*barHeight)} 
-                                x2={xLeft+positionCalculation(checkedFeatures,feature)+eachWidth}  
-                                y2={bar_base+((songs[i][nextFeatureFind(checkedFeatures,feature)])*barHeight)} 
+                                y1={bar_base+(normalizedValue(feature,songs[i][feature])*barHeight)} 
+                                x2={xLeft+positionCalculation(checkedFeatures,feature)+eachWidth}
+                                y2={bar_base+(normalizedValue(nextFeatureFind(checkedFeatures,feature),songs[i][nextFeatureFind(checkedFeatures,feature)])*barHeight)}      
                                 style="stroke: {colorScale(songs[i]["id"])};"
                                 on:mouseenter={()=>{
                                     selectedSong=songs[i]["id"];
@@ -220,7 +255,7 @@
                                 />
                             {:else if singleLengthFind(checkedFeatures)==1}
                                 <circle class="circleValue" cx={xLeft+positionCalculation(checkedFeatures,feature)}
-                                cy={bar_base+((songs[i][feature])*barHeight)} r="6" style="fill: {colorScale(songs[i]["id"])};"
+                                cy={bar_base+(normalizedValue(feature,songs[i][feature])*barHeight)} r="6" style="fill: {colorScale(songs[i]["id"])};"
                                 />
                             {/if}
                         {/if}
