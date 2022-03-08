@@ -5,25 +5,6 @@
   import Timeline from "./components/MM_timeline.svelte";
   import ParallelCoordinates from "./components/MH_parallel_cord.svelte";
   import Recommend from "./components/ES_recomended_filters_Search.svelte";
-  import { recommendedTracks, addedTracks, seededTracks} from "./stores.js";
-
-  let recTracks;
-  recommendedTracks.subscribe((v) => {
-    recTracks = v;
-    console.log(recTracks);
-  });
-
-  let addTracks;
-  addedTracks.subscribe((v) => {
-    addTracks = v;
-    console.log(addTracks);
-  });
-
-  let seedTracks;
-  seededTracks.subscribe((v) => {
-    seedTracks = v;
-    console.log(seedTracks);
-  });
 </script>
 
 <main>
