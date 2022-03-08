@@ -28,7 +28,28 @@
     }
 
     function addTrack(track) {
-        addedTracks.update(v => [...v, track]);
+        addedTracks.update(v => {
+            if (v.indexOf(track) == -1) {
+                return [track, ...v];
+            } else {
+                return v
+            }
+        });
+    }
+
+    function seedTrack(track) {
+        seededTracks.update(v => {
+            if (v.indexOf(track) == -1) {
+                return [track, ...v].slice(0, 5)
+            } else {
+                return v
+            }
+        });
+    }
+
+    function removeTrack(track) {
+        addedTracks.update(v => v.filter(e => e != track));
+        seededTracks.update(v => v.filter(e => e != track));
     }
 
     onMount(async () => {
@@ -56,7 +77,9 @@
         {#each filteredTracks as track}
             <div class="track">
                 {track.name} - {track.artist} <br>
-                <button on:click={addTrack(track)}>Add Track</button>
+                <button on:click={addTrack(track)}>Add</button>
+                <button on:click={seedTrack(track)}>Seed</button>
+                <button on:click={removeTrack(track)}>Remove</button>
             </div>
         {/each}
     </div>
