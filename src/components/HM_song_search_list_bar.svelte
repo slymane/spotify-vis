@@ -47,6 +47,19 @@
         });
     }
 
+    let recTracks;
+    recommendedTracks.subscribe((v) => {
+        recTracks = v;
+        let mode = recTracks.pop();
+        console.log(mode, recTracks);
+
+        if (mode == "replace") {
+            addedTracks.set(recTracks);
+        } else if (mode == "add") {
+            recTracks.forEach(e => addTrack(e));
+        }
+    });
+
     function removeTrack(track) {
         addedTracks.update(v => v.filter(e => e != track));
         seededTracks.update(v => v.filter(e => e != track));

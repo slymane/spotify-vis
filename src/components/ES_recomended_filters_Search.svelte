@@ -1,6 +1,6 @@
 <script>
     import { spotifyApi } from '../api.js';
-    import { recommendedTracks } from '../stores.js';
+    import { recommendedTracks, seededTracks } from '../stores.js';
     import RangeSlider from "svelte-range-slider-pips";
 
     // State values
@@ -12,25 +12,31 @@
         'loud.', 'pop.', 'speech.', 'valence'
     ];
     let isEnabled = {};
-    attrs.forEach(a => {isEnabled[a] = true});
+    attrs.forEach(a => {isEnabled[a] = false});
 
     let values = {};
     attrs.forEach(a => {values[a] = [0.0, 1.0]});
 
     let recMethod = 'replace';
-    let numTracks = 1;
+    let numTracks = 5;
 
     // TODO: Will need to pull these from HM song search
-    const tracks = ['3Ym9KAplnUsm8kIrwETUBy', '2W889aLIKxULEefrleFBFI', '10EtiDDUz7GoRRpGD3vQpj'];
+    let tracks = [];
+    seededTracks.subscribe(v => {tracks = v;});
 
     function handleRec() {
+        let track_seeds = [];
+        tracks.forEach(e => track_seeds.push(e.id));
         let seedJSON = {
-            'seed_tracks': tracks,
+            'seed_tracks': track_seeds,
             'limit': numTracks,
         }
+
         attrs.forEach(attr => {
-            seedJSON['min_' + attr] = values[attr][0];
-            seedJSON['max_' + attr] = values[attr][1];
+            if (isEnabled[attr]) {
+                seedJSON['min_' + attr] = values[attr][0];
+                seedJSON['max_' + attr] = values[attr][1];
+            }
         })
 
         console.log("Getting Recommendations: ", seedJSON)
@@ -38,8 +44,20 @@
             if (err) {
                 console.error(err);
             } else {
-                console.log(data.tracks);
-                recommendedTracks.set(data.tracks);
+                let ids = [];
+                data.tracks.forEach(e => ids.push(e.id));
+                spotifyApi.getAudioFeaturesForTracks(ids, function(err2, data2) {
+                    if (err2) {
+                        console.error(err2);
+                    } else {
+                        ids.forEach(id => {
+                            let track = data.tracks.filter(x => x.id == id)[0];
+                            let feats = data2.audio_features.filter(x => x.id == id)[0];
+                            attrs.forEach(attr => track[attr] = feats[attr]);
+                        })
+                    }
+                })
+                recommendedTracks.set([...data.tracks, recMethod]);
             }
         });
     }
@@ -65,7 +83,7 @@
 
     <div id="runrec">
         {#each Array(5) as _, i}
-            <div class='seed-track'>{i < tracks.length ? tracks[i] : 'N/A'}</div>
+            <div class='seed-track'>{i < tracks.length ? tracks[i].name : 'N/A'}</div>
         {/each}
 
         <div style='margin-top: 5%;'>
