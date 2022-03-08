@@ -1,28 +1,22 @@
 <script>
-  import { onMount } from "svelte";
-  import * as d3 from "d3";
   import SongSearchListBar from "./components/HM_song_search_list_bar.svelte";
   import BarCharts from "./components/HM_bar_charts.svelte";
   import CircleOfFifth from "./components/MM_circle_of_fifth.svelte";
   import Timeline, { history } from "./components/MM_timeline.svelte";
   import ParallelCoordinates from "./components/MH_parallel_cord.svelte";
   import Recommend from "./components/ES_recomended_filters_Search.svelte";
-  import { recommendedTracks } from "./stores.js";
+  import { recommendedTracks, addedTracks } from "./stores.js";
 
   let recTracks;
   recommendedTracks.subscribe((v) => {
     recTracks = v;
+    console.log(recTracks);
   });
 
-  let artists;
-  let tracks;
-
-  onMount(async () => {
-    // Load artists csv
-    artists = await d3.csv("static/csv/artists.csv");
-    tracks = await d3.csv("static/csv/tracks.csv");
-    console.log(artists);
-    console.log(tracks);
+  let addTracks;
+  addedTracks.subscribe((v) => {
+    addTracks = v;
+    console.log(addTracks);
   });
 </script>
 

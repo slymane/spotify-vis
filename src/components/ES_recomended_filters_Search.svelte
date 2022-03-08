@@ -1,6 +1,6 @@
 <script>
     import { spotifyApi } from '../api.js';
-    import {recommendedTracks} from '../stores.js';
+    import { recommendedTracks } from '../stores.js';
     import RangeSlider from "svelte-range-slider-pips";
 
     // State values
