@@ -2,7 +2,7 @@
   import SongSearchListBar from "./components/HM_song_search_list_bar.svelte";
   import BarCharts from "./components/HM_bar_charts.svelte";
   import CircleOfFifth from "./components/MM_circle_of_fifth.svelte";
-  import Timeline, { history } from "./components/MM_timeline.svelte";
+  import Timeline from "./components/MM_timeline.svelte";
   import ParallelCoordinates from "./components/MH_parallel_cord.svelte";
   import Recommend from "./components/ES_recomended_filters_Search.svelte";
   import { recommendedTracks, addedTracks, seededTracks} from "./stores.js";
