@@ -86,12 +86,12 @@
 <div id="CircleOfFifth">
   <!-- <p>HeatMap</p> -->
   <svg
+    id="CircleOfFifthSVG"
     height="100%"
     width="auto"
-    viewBox="0 0 100 100"
+    viewBox="0 0 150 100"
     preserveAspectRatio="xMinYMin meet"
   >
-    <!-- Outer circle - Major -->
     <g id="cof-sections">
       {#each keyEntries as key, idx}
         {#if idx < 12}
@@ -143,6 +143,33 @@
           </text>
         {/if}
       {/each}
+    </g>
+    <g id="cof-legend">
+      <text
+        x="130"
+        y="5"
+        font-size="8"
+        text-anchor="middle"
+        dominant-baseline="central"
+      >
+        {d3.max(keyEntries, (d) => d[1])}</text
+      >
+      <image
+        href="static/images/inferno.png"
+        x="-90"
+        y="125"
+        height="auto"
+        width="80"
+        preserveAspectRatio="xMinYMin meet"
+        transform="rotate(-90)"
+      />
+      <text
+        x="130"
+        y="95"
+        font-size="8"
+        text-anchor="middle"
+        dominant-baseline="central">0</text
+      >
     </g>
   </svg>
 </div>
