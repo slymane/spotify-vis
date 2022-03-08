@@ -53,6 +53,27 @@
         let mode = recTracks.pop();
         console.log(mode, recTracks);
 
+        // Add song to library if not already existing
+        recTracks.forEach(track => {
+            if (tracks.filter(e => e.id == track.id).length == 0) {
+                console.log(track);
+                track.artist = track.artists[0].name;
+                track.artists = track.artist;
+                tracks.push(track);
+            }
+        })
+
+        tracks = tracks.sort(function(a, b) {
+            if ( a.name < b.name ){
+                return -1;
+            }
+            else if ( a.name > b.name ){
+                return 1;
+            } else {
+                return 0;
+            }
+        });
+
         if (mode == "replace") {
             addedTracks.set(recTracks);
         } else if (mode == "add") {
