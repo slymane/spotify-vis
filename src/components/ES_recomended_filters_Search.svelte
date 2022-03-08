@@ -39,7 +39,6 @@
             }
         })
 
-        console.log("Getting Recommendations: ", seedJSON)
         spotifyApi.getRecommendations(seedJSON, function(err, data) {
             if (err) {
                 console.error(err);
