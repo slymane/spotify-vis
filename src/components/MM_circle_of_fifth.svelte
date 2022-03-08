@@ -158,7 +158,7 @@
         href="static/images/inferno.png"
         x="-90"
         y="125"
-        height="auto"
+        height="100%"
         width="80"
         preserveAspectRatio="xMinYMin meet"
         transform="rotate(-90)"
