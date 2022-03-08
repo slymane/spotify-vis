@@ -5,12 +5,30 @@
 
     let searchName = "";
     let tracks = [];    
+    let recTracks = [];
+
     $: filteredTracks = tracks.filter(function(track) {
         let search = searchName.toLowerCase();
         let nameMatch = track.name.toLowerCase().indexOf(search) != -1;
         let artistMatch = track.artists.toLowerCase().indexOf(search) != -1;
-        return nameMatch || artistMatch;
+        let inBank = $addedTracks.indexOf(track) != -1 ||
+                     $seededTracks.indexOf(track) != -1 ||
+                     recTracks.indexOf(track) != -1
+        return nameMatch || artistMatch || inBank;
     }).sort(function(a, b) {
+        let inBankA = $addedTracks.indexOf(a) != -1 ||
+                     $seededTracks.indexOf(a) != -1 ||
+                     recTracks.indexOf(a) != -1
+        let inBankB = $addedTracks.indexOf(b) != -1 ||
+                     $seededTracks.indexOf(b) != -1 ||
+                     recTracks.indexOf(b) != -1
+    
+        if (!inBankA && inBankB) {
+            return -1
+        } else if (inBankA && !inBankB) {
+            return 1
+        }
+    
         if ( a.popularity < b.popularity ){
             return -1;
         }
@@ -40,6 +58,7 @@
     function seedTrack(track) {
         seededTracks.update(v => {
             if (v.indexOf(track) == -1) {
+                addTrack(track);
                 return [track, ...v].slice(0, 5)
             } else {
                 return v
@@ -47,38 +66,28 @@
         });
     }
 
-    let recTracks;
     recommendedTracks.subscribe((v) => {
         recTracks = v;
         let mode = recTracks.pop();
-        console.log(mode, recTracks);
 
         // Add song to library if not already existing
-        recTracks.forEach(track => {
-            if (tracks.filter(e => e.id == track.id).length == 0) {
-                console.log(track);
-                track.artist = track.artists[0].name;
-                track.artists = track.artist;
-                tracks.push(track);
-            }
-        })
-
-        tracks = tracks.sort(function(a, b) {
-            if ( a.name < b.name ){
-                return -1;
-            }
-            else if ( a.name > b.name ){
-                return 1;
-            } else {
-                return 0;
-            }
-        });
+        for (let i = 0; i < recTracks.length; i++) {
+            recTracks[i].artist = recTracks[i].artists[0].name
+            recTracks[i].artists = recTracks[i].artist;
+            tracks.push(recTracks[i]);
+            // if (tracks.filter(e => e.id == recTracks[i].id).length == 0) {
+            //     console.log(recTracks[i]);
+            //     tracks.push(recTracks[i]);
+            // }
+        }
 
         if (mode == "replace") {
             addedTracks.set(recTracks);
         } else if (mode == "add") {
             recTracks.forEach(e => addTrack(e));
         }
+
+        seededTracks.set([]);
     });
 
     function removeTrack(track) {
@@ -109,10 +118,10 @@
     <input bind:value={searchName}>
     <div id="track-list">
         {#each filteredTracks as track}
-            <div class="track">
+            <div class="track" class:recommended={recTracks.indexOf(track) != -1}>
                 {track.name} - {track.artist} <br>
-                <button on:click={addTrack(track)}>Add</button>
-                <button on:click={seedTrack(track)}>Seed</button>
+                <button class:added={$addedTracks.indexOf(track) != -1} on:click={addTrack(track)}>Add</button>
+                <button class:seeded={$seededTracks.indexOf(track) != -1} on:click={seedTrack(track)}>Seed</button>
                 <button on:click={removeTrack(track)}>Remove</button>
             </div>
         {/each}
@@ -137,5 +146,22 @@
     .track {
         border: 2px solid #eee;
         margin-top: 4px;
+        margin-right: 4px;
+        padding: 4px;
+    }
+
+    .added {
+        color: white;
+        background-color: #8DA0CB;
+    }
+
+    .seeded {
+        color: white;
+        background-color: #66C2A5;
+    }
+
+    .recommended {
+        color: white;
+        background-color: #FC8D62;
     }
 </style>
