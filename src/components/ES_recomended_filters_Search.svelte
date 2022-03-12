@@ -6,7 +6,7 @@
     // State values
     const attrs = [
         'acousticness', 'danceability', 'energy', 'instrumentalness', 'liveness', 
-        'loudoudness', 'popularity', 'speechiness', 'valence'];
+        'loudness', 'popularity', 'speechiness', 'valence'];
     const attrsShort = [
         'acoustic', 'dance.', 'energy', 'instru.', 'liveness', 
         'loud.', 'pop.', 'speech.', 'valence'
@@ -52,7 +52,10 @@
                         ids.forEach(id => {
                             let track = data.tracks.filter(x => x.id == id)[0];
                             let feats = data2.audio_features.filter(x => x.id == id)[0];
+                            feats['popularity'] = track['popularity'];
                             attrs.forEach(attr => track[attr] = feats[attr]);
+                            track['key'] = feats['key'];
+                            track['mode'] = feats['mode'];
                         })
                     }
                 })
