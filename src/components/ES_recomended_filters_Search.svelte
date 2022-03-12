@@ -39,6 +39,14 @@
             }
         })
 
+        if (isEnabled['popularity']) {
+            seedJSON['min_popularity'] = Math.round(seedJSON['min_popularity'] * 100);
+            seedJSON['max_popularity'] = Math.round(seedJSON['max_popularity'] * 100);
+        }
+
+        console.log(seedJSON['min_popularity']);
+        console.log(seedJSON['max_popularity']);
+
         spotifyApi.getRecommendations(seedJSON, function(err, data) {
             if (err) {
                 console.error(err);
