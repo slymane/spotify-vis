@@ -3,14 +3,19 @@
 	import { schemeCategory10 } from "d3-scale-chromatic";
     import { addedTracks, recommendedTracks, seededTracks } from '../stores.js';
 
+    let recTracks;
+    let addSongs;
     let songs;
-    addedTracks.subscribe(v => {songs = v});
-    // console.log(songs);
-    // let recTracks;
-    // recommendedTracks.subscribe(v => {recTracks = v});
+    let seedTracks;
 
-    // let seedTracks;
-    // seededTracks.subscribe(v => {seedTracks = v});
+    recommendedTracks.subscribe(v => {
+        recTracks = v;
+    });
+    addedTracks.subscribe(v => {
+        songs = v;
+    });
+    seededTracks.subscribe(v => {seedTracks = v});
+    
     let feature_name_list =[
             {name:"acousticness",feature_checkbox:true},
             {name:"danceability",feature_checkbox:true},
@@ -120,6 +125,9 @@
         return featureArray.length;
     }
     function normalizedValue(feature, value){
+        if(value==undefined){
+                value=0;
+            }
         if(feature == "loudness"){
             min_value=0;
             max_value=60;
@@ -135,6 +143,7 @@
             max_value=1;
             norm_value=(Math.abs(value)-min_value)/(max_value-min_value);
         }
+
         return norm_value;
     }   
 
@@ -171,12 +180,12 @@
                     {#each checkedFeatures as feature,j}
                         {#if feature!=null}
                             {#if feature!=lastPosition(checkedFeatures, feature)}
-                                <line class="value_lines {lineSelect!=false ? selectedSong==songs[i]["id"] ? "this-one-selected":"this-one-not-selected":"pre-selected"}" 
+                                <line class="{lineSelect!=false ? selectedSong==songs[i]["id"] ? "this-one-selected":"this-one-not-selected":"pre-selected"}
+                                {(recTracks.some(s => s.id === song.id)===false)?(seedTracks.some(s => s.id === song.id)===true)? "seedTrackLine":"addTrackLine":"recTrackLine"}"
                                 x1={xLeft+positionCalculation(checkedFeatures,feature)}  
                                 y1={bar_base+(normalizedValue(feature,songs[i][feature])*barHeight)} 
                                 x2={xLeft+positionCalculation(checkedFeatures,feature)+eachWidth}
                                 y2={bar_base+(normalizedValue(nextFeatureFind(checkedFeatures,feature),songs[i][nextFeatureFind(checkedFeatures,feature)])*barHeight)}      
-                                style="stroke: {colorScale(songs[i]["id"])};"
                                 on:mouseenter={()=>{
                                     selectedSong=songs[i]["id"];
                                     lineSelect=true;
@@ -186,14 +195,14 @@
                                 }}
                                 />
                             {:else if singleLengthFind(checkedFeatures)==1}
-                                <circle class="circleValue" cx={xLeft+positionCalculation(checkedFeatures,feature)}
-                                cy={bar_base+(normalizedValue(feature,songs[i][feature])*barHeight)} r="6" style="fill: {colorScale(songs[i]["id"])};"
+                                <circle class="circleValue  {(recTracks.some(s => s.id === song.id)===false)?(seedTracks.some(s => s.id === song.id)===true)? "seedTrackCircle":"addTrackCircle":"recTrackCircle"}" 
+                                    cx={xLeft+positionCalculation(checkedFeatures,feature)}
+                                cy={bar_base+(normalizedValue(feature,songs[i][feature])*barHeight)} r="6"
                                 />
                             {/if}
                         {/if}
                     {/each}
                 {/each}
-
             </g>
         </svg>
     </div>
@@ -251,13 +260,19 @@
 		stroke: black;
 		stroke-width: 1;
 	}
-line.value_lines{
-    stroke-width: 3; 
-    stroke-opacity: 0.75;  
-}
+
 line.pre-selected{
     stroke-width: 2; 
     stroke-opacity: 0.75;  
+}
+line.addTrackLine{
+    stroke: #8DA0CB;  
+}
+line.seedTrackLine{
+    stroke: #66C2A5;  
+}
+line.recTrackLine{
+    stroke: #FC8D62;  
 }
 line.this-one-selected{
     stroke-width: 3; 
@@ -267,11 +282,21 @@ line.this-one-not-selected{
     stroke-width: 1; 
     stroke-opacity: 0.2;
 }
+
 #feature_checkbox{
     cursor: pointer;
 }
 .circleValue{
     stroke-width: 1;
     fill-opacity: 1;
+}
+circle.addTrackCircle{
+    fill: #8DA0CB;
+}
+circle.seedTrackCircle{
+    fill: #66C2A5;
+}
+circle.recTrackCircle{
+    fill: #FC8D62;
 }
 </style>
