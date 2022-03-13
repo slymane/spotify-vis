@@ -11,6 +11,7 @@
         'acoustic', 'dance.', 'energy', 'instru.', 'liveness', 
         'loud.', 'pop.', 'speech.', 'valence'
     ];
+
     let isEnabled = {};
     attrs.forEach(a => {isEnabled[a] = false});
 
@@ -44,9 +45,6 @@
             seedJSON['max_popularity'] = Math.round(seedJSON['max_popularity'] * 100);
         }
 
-        console.log(seedJSON['min_popularity']);
-        console.log(seedJSON['max_popularity']);
-
         spotifyApi.getRecommendations(seedJSON, function(err, data) {
             if (err) {
                 console.error(err);
@@ -57,17 +55,17 @@
                     if (err2) {
                         console.error(err2);
                     } else {
-                        ids.forEach(id => {
-                            let track = data.tracks.filter(x => x.id == id)[0];
-                            let feats = data2.audio_features.filter(x => x.id == id)[0];
-                            feats['popularity'] = track['popularity'];
-                            attrs.forEach(attr => track[attr] = feats[attr]);
-                            track['key'] = feats['key'];
-                            track['mode'] = feats['mode'];
-                        })
+                        for (let i = 0; i < data.tracks.length; i++) {
+                            let feats = data2.audio_features.filter(x => x.id == data.tracks[i].id)[0];
+                            feats['popularity'] = data.tracks[i]['popularity'];
+                            attrs.forEach(attr => data.tracks[i][attr] = feats[attr]);
+                            data.tracks[i]['key'] = feats['key'];
+                            data.tracks[i]['mode'] = feats['mode'];
+                        }
+
+                        recommendedTracks.set([...data.tracks, recMethod]);
                     }
                 })
-                recommendedTracks.set([...data.tracks, recMethod]);
             }
         });
     }
