@@ -34,9 +34,7 @@
     Dm: 0,
   };
 
-  // TODO: Create a array that can translate the Spotify key and mode to the keys in the correct order for cofFormat
   // https://developer.spotify.com/documentation/web-api/reference/#/operations/get-several-audio-features
-
   // Spotify doesn't use every key, so we need to map the keys to the ones that are used
   let spotifyFormat = [
     // Mode = 1
