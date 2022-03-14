@@ -61,6 +61,7 @@
                             attrs.forEach(attr => data.tracks[i][attr] = feats[attr]);
                             data.tracks[i]['key'] = feats['key'];
                             data.tracks[i]['mode'] = feats['mode'];
+                            data.tracks[i]['time_signature'] = feats['time_signature'];
                         }
 
                         recommendedTracks.set([...data.tracks, recMethod]);
