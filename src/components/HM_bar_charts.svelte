@@ -1,15 +1,30 @@
 <script>
-    import { addedTracks, seededTracks, recommendedTracks } from '../stores.js';
-    import { onMount } from "svelte";
+    import { addedTracks } from '../stores.js';
     import { scaleLinear } from 'd3-scale';
 
     let addTracks;
     let graphedTracksArtists;
-
+	let graphedTracksTime;
+	let graphedTracksArtistsTop;
+	let graphedTracksTimeTop;
     addedTracks.subscribe((v) => {
         addTracks = v;
         graphedTracksArtists = findOcc(addTracks,"artist");
-        console.log(graphedTracksArtists);
+		graphedTracksArtists.sort(function (artist1, artist2) {
+				if (artist1.occurrence > artist2.occurrence) return -1;
+				if (artist1.occurrence < artist2.occurrence) return 1;
+				if (artist1.artist > artist2.artist) return -1;
+				if (artist1.artist < artist2.artist) return 1;
+			});
+		graphedTracksTime = findOcc(addTracks,"time_signature");
+		graphedTracksTime.sort(function (time1, time2) {
+				if (time1.occurrence > time2.occurrence) return -1;
+				if (time1.occurrence < time2.occurrence) return 1;
+				if (time1.time_signature > time2.time_signature) return -1;
+				if (time1.time_signature < time2.time_signature) return 1;
+			});
+		graphedTracksArtistsTop=graphedTracksArtists.slice(0,6);
+		graphedTracksTimeTop=graphedTracksTime.slice(0,6);
   });   
 
     function findOcc(arr, key){
@@ -37,7 +52,7 @@
 	const yTicks = [0, 5, 10, 15, 20];
 	const padding = { top: 20, right: 15, bottom: 20, left: 25 };
 
-	let width = 500;
+	let width = 200;
 	let height = 200;
 
 	function formatMobile(tick) {
@@ -56,8 +71,8 @@
 	$: barWidth = innerWidth / xTicks.length;
 </script>
 
-<div class="chart" bind:clientWidth={width} bind:clientHeight={height}>
-	<svg>
+<div class="chart" bind:clientWidth={width} bind:clientHeight={height} word-wrap="break-word">
+	<svg  transform="translate(-350,35)">
 		<!-- y axis -->
 		<g class="axis y-axis">
 			{#each yTicks as tick}
@@ -70,15 +85,47 @@
 
 		<!-- x axis -->
 		<g class="axis x-axis">
-			{#each graphedTracksArtists as point, i}
+			{#each graphedTracksArtistsTop as point, i}
 				<g class="tick" transform="translate({xScale(i)},{height})">
-					<text x="{barWidth/2}" y="-4">{width > 380 ? point.artist : formatMobile(point.artist)}</text>
+					<text x="{barWidth/2}" y="-6" word-wrap="break-word">{width > 380 ? point.artist : formatMobile(point.artist)}</text>
 				</g>
 			{/each}
 		</g>
 
 		<g class='bars'>
-			{#each graphedTracksArtists as point, i}
+			{#each graphedTracksArtistsTop as point, i}
+				<rect
+					x="{xScale(i) + 2}"
+					y="{yScale(point.occurrence)}"
+					width="{barWidth - 4}"
+					height="{yScale(0) - yScale(point.occurrence)}"
+				></rect>
+			{/each}
+		</g>
+	</svg> 
+
+	<svg transform="translate(250,-169)">
+		<!-- y axis -->
+		<g class="axis y-axis">
+			{#each yTicks as tick}
+				<g class="tick tick-{tick}" transform="translate(0, {yScale(tick)})">
+					<line x2="100%"></line>
+					<text y="-4">{tick} {tick === 20 ? ' Occurances' : ''}</text>
+				</g>
+			{/each}
+		</g>
+
+		<!-- x axis -->
+		<g class="axis x-axis">
+			{#each graphedTracksTimeTop as point, i}
+				<g class="tick" transform="translate({xScale(i)},{height})">
+					<text x="{barWidth/2}" y="-6">{width > 380 ? point.time_signature : formatMobile(point.time_signature)}</text>
+				</g>
+			{/each}
+		</g>
+
+		<g class='bars'>
+			{#each graphedTracksTimeTop as point, i}
 				<rect
 					x="{xScale(i) + 2}"
 					y="{yScale(point.occurrence)}"
@@ -93,10 +140,10 @@
 
 <style>
     #BarCharts{
-        height: 100%;
+        height: 50%;
     }
     .container {
-    display: flex;
+    display: auto;
     width: 100%;
     height: 150px;
     }
@@ -104,13 +151,16 @@
     .chart {
 		width: 100%;
 		max-width: 500px;
+		height: 75%;
 		margin: 0 auto;
 	}
 
 	svg {
-		position: relative;
+		position: auto;
 		width: 100%;
 		height: 200px;
+		word-wrap: break-word;
+		
 	}
 
 	.tick {
@@ -138,8 +188,8 @@
 	}
 
 	.bars rect {
-		fill: #a11;
+		fill: #8DA0CB;
 		stroke: none;
-		opacity: 0.65;
+
 	}
 </style>
