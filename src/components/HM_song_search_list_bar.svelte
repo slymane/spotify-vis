@@ -43,7 +43,7 @@
       }
     })
     .reverse()
-    .slice(0, 20);
+    .slice(0, 50);
 
   function artists2artist(s) {
     s = s.slice(1, -1);
@@ -77,14 +77,15 @@
     let mode = recTracks.pop();
 
     // Add song to library if not already existing
+    let tids = tracks.map(t => t.id);
     for (let i = 0; i < recTracks.length; i++) {
+      let old_idx = tids.indexOf(recTracks[i].id);
       recTracks[i].artist = recTracks[i].artists[0].name;
-      // recTracks[i].artists = recTracks[i].artist;
-      tracks.push(recTracks[i]);
-      // if (tracks.filter(e => e.id == recTracks[i].id).length == 0) {
-      //     console.log(recTracks[i]);
-      //     tracks.push(recTracks[i]);
-      // }
+      if (old_idx != -1) {
+        tracks[old_idx] = recTracks[i];
+      } else {
+        tracks.push(recTracks[i]);
+      }
     }
 
     if (mode == "replace") {
