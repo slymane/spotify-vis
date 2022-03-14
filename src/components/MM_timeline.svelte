@@ -57,7 +57,6 @@
   {#if timeline.length > 0}
     <svg
       id="timeline-svg"
-      height="100%"
       width="100%"
       viewBox="0 0 100 {nodeDist * timeline.length}"
       preserveAspectRatio="xMinYMin meet"
@@ -101,7 +100,7 @@
 </div>
 
 <style>
-  #timeline {
+  #timeline-div {
     height: 100%;
     overflow-x: hidden;
     overflow-y: scroll;
