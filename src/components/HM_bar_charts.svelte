@@ -99,7 +99,7 @@
 					<text y="-4">{tick} </text>
 				</g>
 			{/each}
-			<text y="16" x="30" style="font-family: Helvetica, Arial; font-size: .725em; font-weight: 200; fill: #ccc;">Occurances </text>
+			<text y="16" x="30" style="font-family: Helvetica, Arial; font-size: .725em; font-weight: 200; fill: #494848;">Occurances </text>
 			
 			
 		</g>
@@ -135,7 +135,7 @@
 					<text y="-4">{tick}</text>
 				</g>
 			{/each}
-			<text y="16" x="30" style="font-family: Helvetica, Arial; font-size: .725em; font-weight: 200; fill: #ccc;">Occurances </text>
+			<text y="16" x="30" style="font-family: Helvetica, Arial; font-size: .725em; font-weight: 200; fill: #494848;">Occurances </text>
 		</g>
 
 		<!-- x axis -->
@@ -195,12 +195,12 @@
 	}
 
 	.tick line {
-		stroke: #e2e2e2;
+		stroke: #494848;
 		stroke-dasharray: 2;
 	}
 
 	.tick text {
-		fill: #ccc;
+		fill: #494848;
 		text-anchor: start;
 		overflow-wrap: break-word;
 		
